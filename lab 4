@@ -1,0 +1,38 @@
+postgres=# DROP TABLE students;
+DROP TABLE
+postgres=# CREATE TABLE students (
+    student_id SERIAL PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    faculty VARCHAR(100)
+);
+CREATE TABLE
+postgres=# DROP TABLE test_table;
+ERROR:  table "test_table" does not exist
+postgres=# DROP TABLE IF EXISTS test_table;
+NOTICE:  table "test_table" does not exist, skipping
+DROP TABLE
+postgres=# ALTER TABLE students ADD COLUMN date_of_birh DATE;
+ALTER TABLE
+postgres=# ALTER TABLE students DROP COLUMN faculty;
+ALTER TABLE
+postgres=# ALTER TABLE students ALTER COLUMN first_name TYPE TEXT;
+ALTER TABLE
+postgres=# ALTER TABLE students ADD CONSTRAINT unique_student_email UNIQUE (email);
+ALTER TABLE
+postgres=# ALTER TABLE students RENAME COLUMN email TO email_adress;
+ALTER TABLE
+postgres=# ALTER TABLE students RENAME TO university_students
+postgres-# ;
+ALTER TABLE
+postgres-# \dt
+                List of relations
+ Schema |        Name         | Type  |  Owner
+--------+---------------------+-------+----------
+ public | university_students | table | postgres
+(1 row)
+
+postgres=# CREATE TEMP TABLE temp ( temp_col INTEGER );
+CREATE TABLE
+postgres=# \q
