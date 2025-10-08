@@ -1,0 +1,103 @@
+postgres=# CREATE TABLE students_bad (
+postgres(#student_id INT PRIMARY KEY,
+postgres(#name VARCHAR(100),
+postgres(#phone_numbers TEXT);
+CREATE TABLE
+postgres=# CREATE TABLE students (
+postgres(#student_id INT PRIMARY KEY,
+postgres(#name VARCHAR(100));
+CREATE TABLE
+postgres=#CREATE TABLE student_phones (
+postgres(#student_id INT,
+postgres(#phone_number VARCHAR(15),
+postgres(#phone_type VARCHAR(20),
+postgres(#PRIMARY KEY (student_id, phone_number),
+postgres(#FOREIGN KEY (student_id) REFERENCES students(student_id));
+CREATE TABLE
+postgres=# CREATE TABLE enrollments_bad (
+postgres(#student_id INT,
+postgres(#course_id INT,
+postgres(#course_name VARCHAR(100),
+postgres(#grade CHAR(2),
+postgres(#PRIMARY KEY (student_id, course_id));
+CREATE TABLE
+postgres=# CREATE TABLE courses (
+postgres(#course_id INT PRIMARY KEY,
+postgres(#course_name VARCHAR(100),
+postgres(#credits INT);
+CREATE TABLE
+postgres=#CREATE TABLE enrollments (
+postgres(#student_id INT,
+postgres(#course_id INT,
+postgres(#grade CHAR(2),
+postgres(#PRIMARY KEY (student_id, course_id),
+postgres(#FOREIGN KEY (student_id) REFERENCES students(student_id),
+postgres(#FOREIGN KEY (course_id) REFERENCES courses(course_id));
+CREATE TABLE
+postgres=# DROP TABLE students_bad;
+DROP TABLE
+postgres=# CREATE TABLE students_bad (
+postgres(#student_id INT PRIMARY KEY,
+postgres(#name VARCHAR(100),
+postgres(#department_id INT,
+postgres(#department_name VARCHAR(100));
+CREATE TABLE
+postgres=# DROP TABLE departments CASCADE;
+NOTICE:  drop cascades to constraint employees_dept_id_fkey on table employees
+DROP TABLE
+postgres=# CREATE TABLE departments (
+postgres(#department_id INT PRIMARY KEY,
+postgres(#department_name VARCHAR(100),
+postgres(#department_head VARCHAR(100));
+CREATE TABLE
+postgres=# DROP TABLE students CASCADE;
+NOTICE:  drop cascades to 2 other objects
+DETAIL:  drop cascades to constraint student_phones_student_id_fkey on table student_phones
+drop cascades to constraint enrollments_student_id_fkey on table enrollments
+DROP TABLE
+postgres=# CREATE TABLE students (
+postgres(#student_id INT PRIMARY KEY,
+postgres(#name VARCHAR(100),
+postgres(#department_id INT,
+postgres(#FOREIGN KEY (department_id) REFERENCES departments(department_id));
+CREATE TABLE
+postgres=# CREATE TABLE authors (
+postgres(#author_id SERIAL PRIMARY KEY,
+postgres(#first_name VARCHAR(50) NOT NULL,
+postgres(#last_name VARCHAR(50) NOT NULL,
+postgres(#birth_date DATE);
+CREATE TABLE
+postgres=#CREATE TABLE books (
+postgres(#book_id SERIAL PRIMARY KEY,
+postgres(#title VARCHAR(200) NOT NULL,
+postgres(#isbn VARCHAR(13) UNIQUE,
+postgres(#publication_year INTEGER,
+postgres(#available_copies INTEGER DEFAULT 1);
+CREATE TABLE
+postgres=#CREATE TABLE book_authors (
+postgres(#book_id INTEGER,
+postgres(#author_id INTEGER,
+postgres(#PRIMARY KEY (book_id, author_id),
+postgres(#FOREIGN KEY (book_id) REFERENCES books(book_id),
+postgres(#FOREIGN KEY (author_id) REFERENCES authors(author_id));
+CREATE TABLE
+postgres=#CREATE TABLE members (
+postgres(#member_id SERIAL PRIMARY KEY,
+postgres(#first_name VARCHAR(50) NOT NULL,
+postgres(#last_name VARCHAR(50) NOT NULL,
+postgres(#email VARCHAR(100) UNIQUE NOT NULL,
+postgres(#phone VARCHAR(15),
+postgres(#membership_date DATE DEFAULT CURRENT_DATE);
+CREATE TABLE
+postgres=#CREATE TABLE loans (
+postgres(#loan_id SERIAL PRIMARY KEY,
+postgres(#member_id INTEGER NOT NULL,
+postgres(#book_id INTEGER NOT NULL,
+postgres(#loan_date DATE DEFAULT CURRENT_DATE,
+postgres(#due_date DATE NOT NULL,
+postgres(#return_date DATE,
+postgres(#late_fee DECIMAL(10,2) DEFAULT 0.00,
+postgres(#FOREIGN KEY (member_id) REFERENCES members(member_id),
+postgres(#FOREIGN KEY (book_id) REFERENCES books(book_id));
+CREATE TABLE
+postgres=#
