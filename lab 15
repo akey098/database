@@ -1,0 +1,272 @@
+CREATE TABLE employees (
+    employee_id SERIAL PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    email VARCHAR(100),
+    department VARCHAR(50),
+    hire_date DATE DEFAULT CURRENT_DATE,
+    salary DECIMAL(10,2)
+);
+
+INSERT INTO employees (first_name, last_name, email, department, salary) VALUES
+('Alice', 'Smith', 'alice@company.com', 'IT', 70000),
+('Bob', 'Jones', 'bob@company.com', 'HR', 55000),
+('Charlie', 'Brown', 'charlie@company.com', 'IT', 80000);
+
+CREATE TABLE departments (
+    department_id SERIAL PRIMARY KEY,
+    name VARCHAR(50),
+    location VARCHAR(100)
+);
+
+INSERT INTO departments (name, location) VALUES
+('IT', 'New York'),
+('HR', 'Boston'),
+('Finance', 'Chicago');
+
+CREATE TABLE products (
+    product_id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    price DECIMAL(10,2) CHECK (price >= 0)
+);
+
+INSERT INTO products (name, price) VALUES
+('Laptop', 999.99),
+('Mouse', 25.50),
+('Keyboard', 79.99),
+('Monitor', 199.99);
+
+CREATE TABLE customers (
+    customer_id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    email VARCHAR(100)
+);
+
+INSERT INTO customers (name, email) VALUES
+('John Doe', 'john@sample.com'),
+('Jane Roe', 'jane@sample.com');
+
+CREATE TABLE orders (
+    order_id SERIAL PRIMARY KEY,
+    customer_id INT REFERENCES customers(customer_id),
+    total DECIMAL(10,2),
+    order_date DATE DEFAULT CURRENT_DATE
+);
+
+INSERT INTO orders (customer_id, total) VALUES
+(1, 250.00),
+(2, 125.00);
+
+CREATE TABLE order_items (
+    order_item_id SERIAL PRIMARY KEY,
+    order_id INT REFERENCES orders(order_id),
+    product_id INT REFERENCES products(product_id),
+    quantity INT
+);
+
+INSERT INTO order_items (order_id, product_id, quantity) VALUES
+(1, 1, 1),
+(1, 2, 2),
+(2, 3, 1);
+
+CREATE TABLE customer_feedback (
+    feedback_id SERIAL PRIMARY KEY,
+    customer_id INT REFERENCES customers(customer_id),
+    comment TEXT
+);
+
+INSERT INTO customer_feedback (customer_id, comment) VALUES
+(1, 'Loved the product, will buy again!'),
+(2, 'Good service, but shipping was "slow", took 5 days.');
+
+CREATE TABLE sales_data (
+    sale_id SERIAL PRIMARY KEY,
+    product_id INT REFERENCES products(product_id),
+    quantity INT,
+    total DECIMAL(10,2),
+    region VARCHAR(50)
+);
+
+INSERT INTO sales_data (product_id, quantity, total, region) VALUES
+(1, 3, 2999.97, 'North'),
+(2, NULL, NULL, 'South'),
+(3, 5, 399.95, NULL);
+
+postgres=# COPY employees TO '/tmp/employees.txt'
+postgres=#WITH DELIMITER '|' NULL 'N/A' CSV HEADER;
+COPY 3
+postgres=# COPY employees(first_name, last_name, email)
+postgres=#FROM '/tmp/new_employees.csv' WITH CSV HEADER;
+COPY 3
+postgres=# COPY (SELECT * FROM employees WHERE department = 'IT')
+postgres=# TO '/tmp/it_employees.csv' WITH CSV HEADER;
+COPY 2
+postgres=# COPY products TO '/tmp/products.csv' WITH CSV HEADER;
+COPY 4
+postgres=# COPY customers TO '/tmp/customers.csv'
+postgres=#WITH CSV HEADER DELIMITER ';' QUOTE '"';
+COPY 2
+postgres=# COPY orders TO '/tmp/orders.csv'
+postgres=# WITH CSV HEADER FORCE_QUOTE (order_date);
+COPY 2
+postgres=# COPY products FROM '/tmp/products.csv' WITH CSV HEADER;
+ERROR:  duplicate key value violates unique constraint "products_pkey"
+DETAIL:  Key (product_id)=(1) already exists.
+CONTEXT:  COPY products, line 2
+postgres=# COPY products FROM '/tmp/products_with_errors.csv'
+WITH CSV HEADER ON_ERROR IGNORE;
+ERROR:  syntax error at or near "ON_ERROR"
+LINE 2: WITH CSV HEADER ON_ERROR IGNORE;
+                        ^
+postgres=# COPY products FROM '/tmp/products_utf8.csv'
+postgres=# WITH CSV HEADER ENCODING 'UTF8';
+ERROR:  could not open file "/tmp/products_utf8.csv" for reading: No such file or directory
+HINT:  COPY FROM instructs the PostgreSQL server process to read a file. You may want a client-side facility such as psqls \copy.
+postgres=# COPY customer_feedback TO '/tmp/feedback.csv'
+postgres=#WITH CSV HEADER DELIMITER ',' QUOTE '"' ESCAPE '"';
+COPY 2
+postgres=# COPY sales_data FROM '/tmp/sales.csv'
+WITH CSV HEADER NULL 'NULL';
+
+CREATE DATABASE company_hr;
+\c company_hr;
+
+CREATE TABLE departments (
+    department_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    location VARCHAR(100)
+);
+
+CREATE TABLE employees (
+    employee_id SERIAL PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    department_id INT REFERENCES departments(department_id),
+    salary NUMERIC(10, 2),
+    hire_date DATE DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE projects (
+    project_id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    start_date DATE,
+    end_date DATE
+);
+
+CREATE TABLE assignments (
+    employee_id INT REFERENCES employees(employee_id),
+    project_id INT REFERENCES projects(project_id),
+    role VARCHAR(50),
+    PRIMARY KEY (employee_id, project_id)
+);
+
+INSERT INTO departments (name, location) VALUES
+('Engineering', 'New York'),
+('HR', 'London'),
+('Finance', 'Berlin');
+
+INSERT INTO employees (first_name, last_name, department_id, salary) VALUES
+('Alice', 'Johnson', 1, 80000),
+('Bob', 'Smith', 1, 95000),
+('Charlie', 'Evans', 2, 60000),
+('Diana', 'White', 3, 72000);
+
+INSERT INTO projects (name, start_date, end_date) VALUES
+('Apollo', '2024-01-01', '2024-12-31'),
+('Hermes', '2024-03-01', '2025-03-01');
+
+INSERT INTO assignments VALUES
+(1, 1, 'Developer'),
+(2, 1, 'Team Lead'),
+(3, 2, 'HR Specialist'),
+(4, 2, 'Analyst');
+
+CREATE DATABASE salesdb;
+\c salesdb;
+
+CREATE TABLE customers (
+    customer_id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    email VARCHAR(100),
+    city VARCHAR(100)
+);
+
+CREATE TABLE products (
+    product_id SERIAL PRIMARY KEY,
+    name VARCHAR(100),
+    price NUMERIC(8,2)
+);
+
+CREATE TABLE orders (
+    order_id SERIAL PRIMARY KEY,
+    customer_id INT REFERENCES customers(customer_id),
+    order_date DATE DEFAULT CURRENT_DATE,
+    total NUMERIC(10,2)
+);
+
+CREATE TABLE order_items (
+    order_id INT REFERENCES orders(order_id),
+    product_id INT REFERENCES products(product_id),
+    quantity INT CHECK (quantity > 0),
+    PRIMARY KEY (order_id, product_id)
+);
+
+INSERT INTO customers (name, email, city) VALUES
+('Lara Croft', 'lara@adventure.com', 'London'),
+('John Wick', 'john@continental.com', 'New York'),
+('Sarah Connor', 'sarah@resistance.net', 'Los Angeles');
+
+INSERT INTO products (name, price) VALUES
+('Laptop', 1200.00),
+('Keyboard', 100.00),
+('Mouse', 50.00),
+('Monitor', 300.00);
+
+INSERT INTO orders (customer_id, total) VALUES
+(1, 1350.00),
+(2, 350.00),
+(3, 1300.00);
+
+INSERT INTO order_items VALUES
+(1, 1, 1),
+(1, 2, 1),
+(2, 2, 2),
+(2, 3, 1),
+(3, 1, 1),
+(3, 4, 1);
+
+pg_dump -h localhost -U postgres -d company_hr > backup.sql
+pg_dump -h localhost -U postgres -d company_hr -Fc > backup.dump
+pg_dump -h localhost -U postgres -d company_hr -t employees -t departments > tables_backup.sql
+pg_dump -h localhost -U postgres -d company_hr -Fc -v > backup.dump
+
+pg_restore -h localhost -U postgres -d company_hr backup.dump
+createdb new_database
+pg_restore -h localhost -U postgres -d new_database backup.dump
+pg_restore -h localhost -U postgres -d company_hr -t employees backup.dump
+pg_restore -h localhost -U postgres -d company_hr -j 4 backup.dump
+
+pg_dump -h localhost -U postgres -d salesdb -s > schema_only.sql
+pg_dump -h localhost -U postgres -d salesdb -a > data_only.sql
+pg_dump -h localhost -U postgres -d salesdb -T log_table -T temp_data > backup_without_logs.sql
+pg_dumpall -h localhost -U postgres > full_cluster_backup.sql
+pg_dump -h localhost -U postgres -d salesdb -Fc
+pg_dump -h localhost -U postgres -d salesdb -Fc -O > backup_with_ownership.dump
+
+pg_basebackup -h localhost -U replication_user -D /backup/base -Ft -z -P
+pg_basebackup -h localhost -U replication_user -D /backup/base -x -P
+
+pg_switch_wal();
+pg_archivecleanup /backup/wal 000000010000000000000010
+
+sudo systemctl stop postgresql
+rm -rf /var/lib/postgresql/data/*
+tar -xf /backup/base/base.tar -C /var/lib/postgresql/data/
+cat > /var/lib/postgresql/data/recovery.signal << EOF
+restore_command = 'cp /backup/wal/%f %p'
+recovery_target_time = '2024-01-15 14:30:00'
+EOF
+sudo systemctl start postgresql
+
+pg_dump -h source_host -U postgres -d source_db -Fc > migration.dump
+pg_restore -h target_host -U postgres -d target_db migration.dump
