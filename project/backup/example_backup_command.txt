@@ -1,0 +1,15 @@
+Example backup commands for the Fitness Club database.
+
+Full backup (custom format):
+pg_dump -Fc -f fitness_club_backup.dump fitness_club_db
+
+Full backup (SQL text format):
+pg_dump -f fitness_club_backup.sql fitness_club_db
+
+Restore from custom dump:
+createdb fitness_club_db_restored
+pg_restore -d fitness_club_db_restored fitness_club_backup.dump
+
+Restore from SQL file:
+createdb fitness_club_db_restored
+psql -d fitness_club_db_restored -f fitness_club_backup.sql
