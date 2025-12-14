@@ -13,12 +13,12 @@ project/
 │   ├── advanced_queries.sql
 │   ├── transactions_and_indexes.sql
 │   └── views_and_functions.sql
+|
 ├── docs/
 │   ├── er_diagram.png
 │   └── project_report.pdf
 └── backup/
-    ├── backup_instructions.md
-    └── example_backup_command.txt
+    └── backup_instructions.md
 ```
 
 ## What the database stores
