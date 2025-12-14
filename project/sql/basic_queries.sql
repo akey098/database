@@ -86,7 +86,8 @@ ORDER BY registration_month DESC;
 SELECT la.locker_id,
        la.locker_number,
        m.first_name || ' ' || m.last_name AS member_name,
-       la.assignment_date
+       la.start_date AS assignment_start_date,
+       la.end_date   AS assignment_end_date
 FROM locker_assignment la
 JOIN member m ON la.member_id = m.member_id
 WHERE m.status = 'active'

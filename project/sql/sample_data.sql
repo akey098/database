@@ -1,4 +1,3 @@
--- sample_data: seed/dev example data
 -- seed membership plans
 INSERT INTO membership_plan (plan_name, description, price, duration_months, visit_limit)
 VALUES
@@ -63,5 +62,8 @@ VALUES
   (4, 1),
   (4, 3);
 
--- seed locker assignments
-INSERT INTO locker_assignment (locker_number, member_id, start_date, end_date_
+INSERT INTO locker_assignment (locker_number, member_id, start_date, end_date)
+VALUES
+  ('A101', 1, '2025-12-01', NULL),
+  ('A102', 2, '2025-12-05', NULL),
+  ('B201', 4, '2025-01-01', '2025-12-31');

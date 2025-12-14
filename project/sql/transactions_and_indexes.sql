@@ -36,17 +36,18 @@ BEGIN;
 UPDATE locker_assignment
 SET end_date = CURRENT_DATE
 WHERE locker_number = 'A101'
-  AND end_date IS NULL;
+  AND end_date IS NULL
+  AND member_id <> 3; -- don't end if already assigned to member 3
 
-INSERT INTO locker_assignment (locker_number, member_id, start_date, end_date)
-VALUES ('A101', 3, CURRENT_DATE, NULL);
+INSERT INTO locker_assignment (locker_number, member_id, start_date)
+VALUES ('A101', 3, CURRENT_DATE);
 
 COMMIT;
 
-CREATE INDEX idx_member_last_name ON member(last_name);
-CREATE INDEX idx_member_email ON member(email);
-CREATE INDEX idx_subscription_member_status ON subscription(member_id, status);
-CREATE INDEX idx_class_schedule_start_time ON class_schedule(start_time);
-CREATE INDEX idx_attendance_member ON attendance(member_id);
-CREATE INDEX idx_payment_member ON payment(member_id);
-CREATE INDEX idx_payment_subscription ON payment(subscription_id);
+CREATE INDEX IF NOT EXISTS idx_member_last_name ON member(last_name);
+CREATE INDEX IF NOT EXISTS idx_member_email ON member(email);
+CREATE INDEX IF NOT EXISTS idx_subscription_member_status ON subscription(member_id, status);
+CREATE INDEX IF NOT EXISTS idx_class_schedule_start_time ON class_schedule(start_time);
+CREATE INDEX IF NOT EXISTS idx_attendance_member ON attendance(member_id);
+CREATE INDEX IF NOT EXISTS idx_payment_member ON payment(member_id);
+CREATE INDEX IF NOT EXISTS idx_payment_subscription ON payment(subscription_id);
