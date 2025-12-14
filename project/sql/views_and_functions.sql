@@ -24,6 +24,7 @@ JOIN membership_plan mp ON s.plan_id = mp.plan_id
 WHERE s.status = 'active'
   AND CURRENT_DATE BETWEEN s.start_date AND s.end_date;
 
+-- class occupancy statistics
 CREATE VIEW view_class_occupancy AS
 SELECT cs.schedule_id,
        c.class_name,
@@ -37,6 +38,7 @@ JOIN class c ON cs.class_id = c.class_id
 LEFT JOIN attendance a ON cs.schedule_id = a.schedule_id
 GROUP BY cs.schedule_id, c.class_name, cs.start_time, cs.end_time, cs.capacity;
 
+-- payments summary per member
 CREATE VIEW view_payments_summary AS
 SELECT m.member_id,
        m.first_name || ' ' || m.last_name AS member_name,
@@ -46,6 +48,7 @@ FROM member m
 LEFT JOIN payment p ON m.member_id = p.member_id
 GROUP BY m.member_id, member_name;
 
+-- members without attendance records
 CREATE VIEW view_members_without_attendance AS
 SELECT m.member_id,
        m.first_name,
@@ -55,6 +58,7 @@ FROM member m
 LEFT JOIN attendance a ON m.member_id = a.member_id
 WHERE a.attendance_id IS NULL;
 
+-- classes assigned to trainers
 CREATE VIEW view_trainer_classes AS
 SELECT t.trainer_id,
        t.first_name || ' ' || t.last_name AS trainer_name,
@@ -67,6 +71,7 @@ FROM trainer t
 JOIN class_schedule cs ON t.trainer_id = cs.trainer_id
 JOIN class c ON cs.class_id = c.class_id;
 
+-- expired subscriptions (still flagged active)
 CREATE VIEW view_expired_subscriptions AS
 SELECT s.subscription_id,
        s.member_id,
@@ -82,6 +87,7 @@ JOIN membership_plan mp ON s.plan_id = mp.plan_id
 WHERE s.end_date < CURRENT_DATE
   AND s.status = 'active';
 
+-- return member full name
 CREATE OR REPLACE FUNCTION fn_get_member_fullname(mid INTEGER)
 RETURNS TEXT AS $$
 SELECT first_name || ' ' || last_name
@@ -89,6 +95,7 @@ FROM member
 WHERE member_id = mid;
 $$ LANGUAGE SQL;
 
+-- extend a subscription by extra days
 CREATE OR REPLACE FUNCTION fn_extend_subscription(sub_id INTEGER, extra_days INTEGER)
 RETURNS VOID AS $$
 UPDATE subscription
@@ -96,6 +103,7 @@ SET end_date = end_date + extra_days
 WHERE subscription_id = sub_id;
 $$ LANGUAGE SQL;
 
+-- register attendance if not already recorded
 CREATE OR REPLACE FUNCTION fn_register_attendance(m_id INTEGER, sched_id INTEGER)
 RETURNS INTEGER AS $$
 BEGIN
@@ -111,6 +119,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- sum of completed payments for a member
 CREATE OR REPLACE FUNCTION fn_member_total_payments(m_id INTEGER)
 RETURNS NUMERIC AS $$
 SELECT COALESCE(SUM(amount), 0)

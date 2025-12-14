@@ -1,3 +1,4 @@
+-- drops existing tables to reset schema
 DROP TABLE IF EXISTS attendance CASCADE;
 DROP TABLE IF EXISTS locker_assignment CASCADE;
 DROP TABLE IF EXISTS payment CASCADE;
@@ -8,6 +9,7 @@ DROP TABLE IF EXISTS subscription CASCADE;
 DROP TABLE IF EXISTS membership_plan CASCADE;
 DROP TABLE IF EXISTS member CASCADE;
 
+-- table: member (stores gym members)
 CREATE TABLE member (
     member_id SERIAL PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
@@ -19,6 +21,7 @@ CREATE TABLE member (
     status VARCHAR(20) NOT NULL DEFAULT 'active'
 );
 
+-- table: membership_plan (available plans)
 CREATE TABLE membership_plan (
     plan_id SERIAL PRIMARY KEY,
     plan_name VARCHAR(50) NOT NULL,
@@ -29,6 +32,7 @@ CREATE TABLE membership_plan (
     is_active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
+-- table: subscription (member plan enrollments)
 CREATE TABLE subscription (
     subscription_id SERIAL PRIMARY KEY,
     member_id INTEGER NOT NULL,
@@ -42,6 +46,7 @@ CREATE TABLE subscription (
     CHECK (end_date > start_date)
 );
 
+-- table: trainer (instructors)
 CREATE TABLE trainer (
     trainer_id SERIAL PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
@@ -51,6 +56,7 @@ CREATE TABLE trainer (
     email VARCHAR(100) UNIQUE
 );
 
+-- table: class (class types)
 CREATE TABLE class (
     class_id SERIAL PRIMARY KEY,
     class_name VARCHAR(50) NOT NULL,
@@ -58,6 +64,7 @@ CREATE TABLE class (
     description TEXT
 );
 
+-- table: class_schedule (scheduled class sessions)
 CREATE TABLE class_schedule (
     schedule_id SERIAL PRIMARY KEY,
     class_id INTEGER NOT NULL,
@@ -72,6 +79,7 @@ CREATE TABLE class_schedule (
     CHECK (capacity > 0)
 );
 
+-- table: attendance (member check-ins to classes)
 CREATE TABLE attendance (
     attendance_id SERIAL PRIMARY KEY,
     schedule_id INTEGER NOT NULL,
@@ -82,6 +90,7 @@ CREATE TABLE attendance (
     UNIQUE (schedule_id, member_id)
 );
 
+-- table: payment (member payments)
 CREATE TABLE payment (
     payment_id SERIAL PRIMARY KEY,
     member_id INTEGER NOT NULL,
@@ -95,6 +104,7 @@ CREATE TABLE payment (
     CHECK (amount > 0)
 );
 
+-- table: locker_assignment (locker usage by members)
 CREATE TABLE locker_assignment (
     locker_id SERIAL PRIMARY KEY,
     locker_number VARCHAR(10) NOT NULL UNIQUE,

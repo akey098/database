@@ -1,3 +1,4 @@
+-- total_paid per member (filter > 40)
 SELECT m.member_id,
        m.first_name || ' ' || m.last_name AS member_name,
        SUM(p.amount) AS total_paid
@@ -7,6 +8,9 @@ WHERE p.status = 'completed'
 GROUP BY m.member_id, member_name
 HAVING SUM(p.amount) > 40
 ORDER BY total_paid DESC;
+
+-- current active subscriptions
+SELECT m.member_id,
 
 SELECT m.member_id,
        m.first_name,
@@ -29,6 +33,9 @@ LEFT JOIN attendance a ON cs.schedule_id = a.schedule_id
 GROUP BY cs.schedule_id, c.class_name, cs.start_time
 ORDER BY cs.start_time;
 
+-- attendees per scheduled class
+SELECT cs.schedule_id,
+
 SELECT m.member_id,
        m.first_name || ' ' || m.last_name AS member_name,
        COUNT(a.attendance_id) AS total_visits,
@@ -37,6 +44,9 @@ FROM member m
 LEFT JOIN attendance a ON m.member_id = a.member_id
 GROUP BY m.member_id, member_name
 ORDER BY visit_rank;
+
+-- class occupancy percent
+WITH stats AS (
 
 WITH stats AS (
     SELECT cs.schedule_id,
@@ -57,6 +67,9 @@ JOIN class_schedule cs ON s.schedule_id = cs.schedule_id
 JOIN class c ON cs.class_id = c.class_id
 ORDER BY occupancy_percent DESC;
 
+-- revenue and subscription counts per plan
+SELECT mp.plan_id,
+
 SELECT mp.plan_id,
        mp.plan_name,
        SUM(p.amount) AS total_revenue,
@@ -68,12 +81,18 @@ LEFT JOIN payment p ON s.subscription_id = p.subscription_id
 GROUP BY mp.plan_id, mp.plan_name
 ORDER BY total_revenue DESC NULLS LAST;
 
+-- members who never attended
+SELECT m.member_id,
+
 SELECT m.member_id,
        m.first_name,
        m.last_name
 FROM member m
 LEFT JOIN attendance a ON m.member_id = a.member_id
 WHERE a.attendance_id IS NULL;
+
+-- subscriptions that ended but still marked active
+SELECT m.member_id,
 
 SELECT m.member_id,
        m.first_name,
@@ -86,6 +105,9 @@ JOIN member m ON s.member_id = m.member_id
 WHERE s.end_date < CURRENT_DATE
   AND s.status = 'active';
 
+-- trainer class counts
+SELECT t.trainer_id,
+
 SELECT t.trainer_id,
        t.first_name || ' ' || t.last_name AS trainer_name,
        COUNT(cs.schedule_id) AS classes_count
@@ -93,6 +115,9 @@ FROM trainer t
 LEFT JOIN class_schedule cs ON t.trainer_id = cs.trainer_id
 GROUP BY t.trainer_id, trainer_name
 ORDER BY classes_count DESC;
+
+-- class load category
+SELECT cs.schedule_id,
 
 SELECT cs.schedule_id,
        c.class_name,

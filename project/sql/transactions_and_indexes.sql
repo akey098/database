@@ -1,3 +1,4 @@
+-- add new member, subscription, and payment
 BEGIN;
 
 WITH new_member AS (
@@ -21,6 +22,7 @@ FROM new_subscription;
 
 COMMIT;
 
+-- demonstrate rollback for invalid payment (negative amount)
 BEGIN;
 
 INSERT INTO payment (member_id, subscription_id, amount, payment_method, status)
@@ -28,6 +30,7 @@ VALUES (1, 1, -10.00, 'card', 'completed');
 
 ROLLBACK;
 
+-- transfer locker assignment to another member
 BEGIN;
 
 UPDATE locker_assignment
